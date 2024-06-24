@@ -33,7 +33,6 @@ public class ListSoundsAndBuffs {
     private static int listSounds(CommandContext<CommandSourceStack> context) {
         File directory = FMLPaths.CONFIGDIR.get().resolve("MusicPower").toFile();
         File soundsFile = new File(directory, "ListedSounds.txt");
-
         try (FileWriter soundWriter = new FileWriter(soundsFile)) {
             soundWriter.write("Sounds:\n");
             for (ResourceLocation sound : ForgeRegistries.SOUND_EVENTS.getKeys()) {

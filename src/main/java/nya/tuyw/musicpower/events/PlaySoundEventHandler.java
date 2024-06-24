@@ -31,31 +31,29 @@ public class PlaySoundEventHandler {
         for (ConfigHandler.EffectConfig effectConfig : ConfigHandler.getEffectConfigs()) {
             if (effectConfig.getSound().equals(soundType.toString())) {
                 MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-                if (server != null) {
-                    for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-                        double distanceSq = player.blockPosition().distSqr(soundPos);
-                        if (distanceSq < effectConfig.getDistance() * effectConfig.getDistance()) {
-                            MobEffect mobEffect = ForgeRegistries.MOB_EFFECTS.getValue(new ResourceLocation(effectConfig.getBuff()));
-                            if (mobEffect != null) {
-                                int buffStrength = effectConfig.getStrength() - 1;
-                                int buffDuration = effectConfig.getDuration() * 20;
-                                if (effectConfig.getStrengthDecaywithDistance() || effectConfig.getDurarionDecaywithDistance()){
-                                    double distance = Math.sqrt(distanceSq);
-                                    double maxDistance = effectConfig.getDistance();
-                                    double distanceF = (maxDistance - distance) / maxDistance;
-                                    if (effectConfig.getStrengthDecaywithDistance()) {
-                                        buffStrength = (int) ((buffStrength + 1) * distanceF);
-                                    }
-                                    if (effectConfig.getDurarionDecaywithDistance()) {
-                                        buffDuration = (int) (buffDuration * distanceF);
-                                    }
-                                }
-                                if (buffDuration > 0 && buffStrength >= 0) {
-                                    player.addEffect(new MobEffectInstance(mobEffect, buffDuration, buffStrength));
-                                    if (!effectConfig.getSendMessage().isEmpty()){
-                                        player.sendSystemMessage(Component.literal(effectConfig.getSendMessage()));
-                                    }
-                                }
+                if (server == null ) break;
+                for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+                    double distanceSq = player.blockPosition().distSqr(soundPos);
+                    if (distanceSq < effectConfig.getDistance() * effectConfig.getDistance()) {
+                        MobEffect mobEffect = ForgeRegistries.MOB_EFFECTS.getValue(new ResourceLocation(effectConfig.getBuff()));
+                        if (mobEffect == null) break;
+                        int buffStrength = effectConfig.getStrength() - 1;
+                        int buffDuration = effectConfig.getDuration() * 20;
+                        if (effectConfig.getStrengthDecaywithDistance() || effectConfig.getDurarionDecaywithDistance()){
+                            double distance = Math.sqrt(distanceSq);
+                            double maxDistance = effectConfig.getDistance();
+                            double distanceF = (maxDistance - distance) / maxDistance;
+                            if (effectConfig.getStrengthDecaywithDistance()) {
+                                buffStrength = (int) ((buffStrength + 1) * distanceF);
+                            }
+                            if (effectConfig.getDurarionDecaywithDistance()) {
+                                buffDuration = (int) (buffDuration * distanceF);
+                            }
+                        }
+                        if (buffDuration > 0 && buffStrength >= 0) {
+                            player.addEffect(new MobEffectInstance(mobEffect, buffDuration, buffStrength));
+                            if (!effectConfig.getSendMessage().isEmpty()){
+                                player.sendSystemMessage(Component.literal(effectConfig.getSendMessage()));
                             }
                         }
                     }
